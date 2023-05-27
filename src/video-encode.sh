@@ -1,6 +1,5 @@
 #!/bin/bash
 
-set -o errexit   # abort on nonzero exitstatus
 set -o nounset   # abort on unbound variable
 set -o pipefail  # don't hide errors within pipes
 
@@ -125,6 +124,9 @@ while IFS= read -r -d '' file; do
         rm -f "$file"
       fi
     fi
+    size_after_total=$((size_after + size_after_total))
+    reduction_ratio=$(bc -l <<< "scale=2; ($size_before - $size_after) / $size_before")
+    printf "# size before: %s\tsize after: %s\treduction: %s\tfilename: %s\n" "$size_before" "$size_after" "$reduction_ratio" "$file"
   else
     # Delete the failed output
     if [ "$DRY_RUN" = true ]; then
@@ -133,10 +135,6 @@ while IFS= read -r -d '' file; do
       rm -f "$output"
     fi
   fi
-
-  size_after_total=$((size_after + size_after_total))
-  reduction_ratio=$(bc -l <<< "scale=2; ($size_before - $size_after) / $size_before")
-  printf "# size before: %s\tsize after: %s\treduction: %s\tfilename: %s\n" "$size_before" "$size_after" "$reduction_ratio" "$file"
 done < <(find "$INPUT_DIR" "${find_options[@]}" -type f \( -iname "*.flv" -o -iname "*.wmv" -o -iname "*.mpg" -o -iname "*.mpeg" -o -iname "*.avi" -o -iname "*.mkv" -o -iname "*.mp4" \) ! -name "*_x265.mp4" ! -name "*_x265.mkv" -print0)
 
 reduction_ratio_total=$(bc -l <<< "scale=2; ($size_before_total - $size_after_total) / $size_before_total")
