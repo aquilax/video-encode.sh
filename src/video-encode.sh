@@ -137,5 +137,7 @@ while IFS= read -r -d '' file; do
   fi
 done < <(find "$INPUT_DIR" "${find_options[@]}" -type f \( -iname "*.flv" -o -iname "*.wmv" -o -iname "*.mpg" -o -iname "*.mpeg" -o -iname "*.avi" -o -iname "*.mkv" -o -iname "*.mp4" \) ! -name "*_x265.mp4" ! -name "*_x265.mkv" -print0)
 
-reduction_ratio_total=$(bc -l <<< "scale=2; ($size_before_total - $size_after_total) / $size_before_total")
-printf "# totals: size before: %s\tsize after: %s\treduction: %s\n" "$size_before_total" "$size_after_total" "$reduction_ratio_total"
+if [ $size_before_total -gt 0 ]; then
+  reduction_ratio_total=$(bc -l <<< "scale=2; ($size_before_total - $size_after_total) / $size_before_total")
+  printf "# totals: size before: %s\tsize after: %s\treduction: %s\n" "$size_before_total" "$size_after_total" "$reduction_ratio_total"
+fi
