@@ -46,7 +46,9 @@ print_file_stats() {
 # Function to process single file
 process_file() {
   local file=$1
-  
+
+  codec=$(ffprobe -v error -select_streams v:0 -show_entries stream=codec_name -of default=noprint_wrappers=1:nokey=1 "$file")
+
   # Get the base filename without extension
   filename=$(basename -- "$file")
   directory=$(dirname "$file")
@@ -55,7 +57,7 @@ process_file() {
   # Set the output directory to the file directory
   OUTPUT_DIR="$directory"
 
-  if [[ ("$file" == *_x265.mp4) || ("$file" == *_x265.mkv) ]]; then
+  if [[ ("$file" == *_x265.mp4) || ("$file" == *_x265.mkv) || ($codec == "hevc") ]]; then
     echo "Skipping $file"
     return
   fi
